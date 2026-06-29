@@ -1,5 +1,4 @@
-from crewai import Agent, Task, Crew, Process
-from langchain_google_genai import ChatGoogleGenerativeAI
+from crewai import Agent, Task, Crew, Process, LLM
 from langchain_community.tools import DuckDuckGoSearchRun
 import os
 
@@ -11,10 +10,10 @@ class ResearchCrew:
     def __init__(self, topic: str, instructions: str = None, api_key: str = None):
         self.topic = topic
         self.instructions = instructions
-        # Use Gemini 2.0 Flash
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
-            google_api_key=api_key or os.getenv("GOOGLE_API_KEY")
+        # Use Gemini 2.0 Flash via CrewAI's LLM class
+        self.llm = LLM(
+            model="gemini/gemini-2.0-flash",
+            api_key=api_key or os.getenv("GOOGLE_API_KEY")
         )
         self.search_tool = DuckDuckGoSearchRun()
 
