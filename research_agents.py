@@ -1,4 +1,8 @@
 from crewai import Agent, Task, Crew, Process, LLM
+import crewai.llms.cache as _crewai_cache
+# Workaround for Groq cache_breakpoint bug: https://github.com/crewAIInc/crewAI/issues/5886
+_crewai_cache.mark_cache_breakpoint = lambda msg: msg
+
 from crewai.tools import BaseTool
 from duckduckgo_search import DDGS
 import os
