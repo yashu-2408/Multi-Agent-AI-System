@@ -15,13 +15,16 @@ st.markdown("""
 st.title("🚀 Multi-Agent Research Assistant")
 st.markdown("Generate comprehensive research reports using a team of specialized AI agents.")
 
-# Default API Key from your request
-DEFAULT_KEY = "AQ.Ab8RN6L9c1StPPEUkKyGrmd8aXlLNZ5im8CGm5mgOnWqVBBXfQ"
-
 # Sidebar Configuration
 with st.sidebar:
     st.header("Settings")
-    api_key = st.text_input("Gemini API Key", value=DEFAULT_KEY, type="password")
+    # Get API key from secrets or environment variable if available
+    try:
+        default_api_key = st.secrets.get("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY", "")
+    except Exception:
+        default_api_key = os.getenv("GOOGLE_API_KEY", "")
+
+    api_key = st.text_input("Gemini API Key", value=default_api_key, type="password")
     st.info("Built with CrewAI, Gemini 2.0 Flash, and Streamlit.")
 
 # Main Input Section
