@@ -24,11 +24,11 @@ class ResearchCrew:
         self.topic = topic
         self.instructions = instructions
 
-        if api_key:
-            os.environ["GROQ_API_KEY"] = "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"
-
         # Groq is free, fast, and reliable — llama-3.3-70b is their best free model
-        self.llm = LLM(model="groq/llama-3.3-70b-versatile")
+        self.llm = LLM(
+            model="groq/llama-3.3-70b-versatile",
+            api_key=api_key
+        )
         self.search_tool = DuckDuckGoSearchTool()
 
     def run(self):
