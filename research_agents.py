@@ -1,20 +1,24 @@
 from crewai import Agent, Task, Crew, Process, LLM
-from crewai import tool
+from crewai.tools import BaseTool
 from duckduckgo_search import DDGS
+from pydantic import Field
 import os
 
-# Custom DuckDuckGo search tool using CrewAI's native @tool decorator
-@tool("DuckDuckGo Search")
-def duckduckgo_search(query: str) -> str:
-    """Search the web using DuckDuckGo and return a summary of results."""
-    with DDGS() as ddgs:
-        results = list(ddgs.text(query, max_results=5))
-    if not results:
-        return "No results found."
-    return "\n\n".join(
-        f"Title: {r['title']}\nURL: {r['href']}\nSnippet: {r['body']}"
-        for r in results
-    )
+
+class DuckDuckGoSearchTool(BaseTool):
+    name: str = "DuckDuckGo Search"
+    description: str = "Search the web using DuckDuckGo. Input should be a search query string."
+
+    def _run(self, query: str) -> str:
+        with DDGS() as ddgs:
+            results = list(ddgs.text(query, max_results=5))
+        if not results:
+            return "No results found."
+        return "\n\n".join(
+            f"Title: {r['title']}\nURL: {r['href']}\nSnippet: {r['body']}"
+            for r in results
+        )
+
 
 class ResearchCrew:
     """
@@ -25,15 +29,13 @@ class ResearchCrew:
         self.topic = topic
         self.instructions = instructions
 
-        # Set the API key in the environment so CrewAI's LLM wrapper picks it up
         if api_key:
             os.environ["GOOGLE_API_KEY"] = api_key
 
-        # CrewAI's native LLM class — pass model as a LiteLLM-format string
         self.llm = LLM(model="gemini/gemini-2.0-flash")
+        self.search_tool = DuckDuckGoSearchTool()
 
     def run(self):
-        # 1. Define Agents
         planner = Agent(
             role="Research Planner",
             goal=f"Plan research objectives for: {self.topic}. Instructions: {self.instructions}",
@@ -46,7 +48,7 @@ class ResearchCrew:
             role="Lead Researcher",
             goal=f"Gather data on: {self.topic}",
             backstory="Specialist in web research and identifying key facts.",
-            tools=[duckduckgo_search],
+            tools=[self.search_tool],
             llm=self.llm
         )
 
@@ -57,7 +59,6 @@ class ResearchCrew:
             llm=self.llm
         )
 
-        # 2. Define Tasks
         plan_task = Task(
             description=f"Create a research plan for '{self.topic}'.",
             expected_output="A list of 3-5 key research objectives.",
@@ -76,7 +77,6 @@ class ResearchCrew:
             agent=writer
         )
 
-        # 3. Assemble the Crew
         crew = Crew(
             agents=[planner, researcher, writer],
             tasks=[plan_task, research_task, write_task],
