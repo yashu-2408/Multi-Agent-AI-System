@@ -1,9 +1,9 @@
 from crewai import Agent, Task, Crew, Process, LLM
-from crewai_tools import tool
+from crewai import tool
 from duckduckgo_search import DDGS
 import os
 
-# Custom DuckDuckGo search tool compatible with CrewAI's native tool format
+# Custom DuckDuckGo search tool using CrewAI's native @tool decorator
 @tool("DuckDuckGo Search")
 def duckduckgo_search(query: str) -> str:
     """Search the web using DuckDuckGo and return a summary of results."""
@@ -29,7 +29,7 @@ class ResearchCrew:
         if api_key:
             os.environ["GOOGLE_API_KEY"] = api_key
 
-        # CrewAI's native LLM class — pass model as a string (LiteLLM format)
+        # CrewAI's native LLM class — pass model as a LiteLLM-format string
         self.llm = LLM(model="gemini/gemini-2.0-flash")
 
     def run(self):
