@@ -1,7 +1,6 @@
 from crewai import Agent, Task, Crew, Process, LLM
 from crewai.tools import BaseTool
 from duckduckgo_search import DDGS
-from pydantic import Field
 import os
 
 
@@ -21,18 +20,15 @@ class DuckDuckGoSearchTool(BaseTool):
 
 
 class ResearchCrew:
-    """
-    Encapsulates the Multi-Agent Research Logic.
-    This structure is easy to explain in an interview as a 'Pipeline pattern'.
-    """
     def __init__(self, topic: str, instructions: str = None, api_key: str = None):
         self.topic = topic
         self.instructions = instructions
 
         if api_key:
-            os.environ["GOOGLE_API_KEY"] = api_key
+            os.environ["GROQ_API_KEY"] = "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"
 
-        self.llm = LLM(model="gemini/gemini-2.5-flash-lite")
+        # Groq is free, fast, and reliable — llama-3.3-70b is their best free model
+        self.llm = LLM(model="groq/llama-3.3-70b-versatile")
         self.search_tool = DuckDuckGoSearchTool()
 
     def run(self):
