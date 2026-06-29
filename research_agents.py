@@ -1,7 +1,20 @@
-from crewai import Agent, Task, Crew, Process
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_community.tools import DuckDuckGoSearchRun
+from crewai import Agent, Task, Crew, Process, LLM
+from crewai_tools import tool
+from duckduckgo_search import DDGS
 import os
+
+# Custom DuckDuckGo search tool compatible with CrewAI's native tool format
+@tool("DuckDuckGo Search")
+def duckduckgo_search(query: str) -> str:
+    """Search the web using DuckDuckGo and return a summary of results."""
+    with DDGS() as ddgs:
+        results = list(ddgs.text(query, max_results=5))
+    if not results:
+        return "No results found."
+    return "\n\n".join(
+        f"Title: {r['title']}\nURL: {r['href']}\nSnippet: {r['body']}"
+        for r in results
+    )
 
 class ResearchCrew:
     """
@@ -11,12 +24,13 @@ class ResearchCrew:
     def __init__(self, topic: str, instructions: str = None, api_key: str = None):
         self.topic = topic
         self.instructions = instructions
-        # Use Gemini 2.0 Flash
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
-            google_api_key=api_key or os.getenv("GOOGLE_API_KEY")
-        )
-        self.search_tool = DuckDuckGoSearchRun()
+
+        # Set the API key in the environment so CrewAI's LLM wrapper picks it up
+        if api_key:
+            os.environ["GOOGLE_API_KEY"] = api_key
+
+        # CrewAI's native LLM class — pass model as a string (LiteLLM format)
+        self.llm = LLM(model="gemini/gemini-2.0-flash")
 
     def run(self):
         # 1. Define Agents
@@ -32,7 +46,7 @@ class ResearchCrew:
             role="Lead Researcher",
             goal=f"Gather data on: {self.topic}",
             backstory="Specialist in web research and identifying key facts.",
-            tools=[self.search_tool],
+            tools=[duckduckgo_search],
             llm=self.llm
         )
 
