@@ -32,7 +32,7 @@ class ResearchCrew:
         if api_key:
             os.environ["GOOGLE_API_KEY"] = api_key
 
-        self.llm = LLM(model="gemini/gemini-1.5-flash-8b")
+        self.llm = LLM(model="gemini/gemini-2.5-flash-lite")
         self.search_tool = DuckDuckGoSearchTool()
 
     def run(self):
