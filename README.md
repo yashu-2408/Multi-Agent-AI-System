@@ -1,4 +1,4 @@
-# 🚀 Team AI: Multi-Agent Research Assistant
+# 🚀 Multi-Agent Research Assistant
 
 A lightweight, high-impact AI Research Assistant built with **Streamlit**, **CrewAI**, and **Groq + Llama 3.3 70B**. Designed to be easily hosted on **Streamlit Cloud** and explained during technical interviews.
 
