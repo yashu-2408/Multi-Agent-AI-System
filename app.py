@@ -53,7 +53,7 @@ if st.button("Generate Report"):
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
 
-with st.expander("💡 Interview Tip: How this works"):
+with st.expander("💡How this works"):
     st.write("""
     This app demonstrates a **Multi-Agent Orchestration** pattern:
     1. **Separation of Concerns**: Each agent (Planner, Researcher, Writer) has a specific role and backstory.
