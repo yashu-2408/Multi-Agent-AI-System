@@ -2,6 +2,10 @@ from crewai import Agent, Task, Crew, Process, LLM
 from crewai.tools import BaseTool
 from duckduckgo_search import DDGS
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # --- Workaround for CrewAI bug #5886 ---
 # CrewAI calls mark_cache_breakpoint() on all messages regardless of provider,
@@ -38,6 +42,8 @@ class ResearchCrew:
 
         if api_key:
             os.environ["GROQ_API_KEY"] = api_key
+        elif "GROQ_API_KEY" not in os.environ:
+            raise ValueError("GROQ_API_KEY not found in environment variables. Please set it in .env file or pass it as a parameter.")
 
         # Lower temperature reduces malformed tool-call syntax from the model
         self.llm = LLM(model="groq/llama-3.3-70b-versatile", temperature=0.2)
