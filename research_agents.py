@@ -3,6 +3,18 @@ from crewai.tools import BaseTool
 from duckduckgo_search import DDGS
 import os
 
+# --- Workaround for CrewAI bug #5886 ---
+# CrewAI calls mark_cache_breakpoint() on all messages regardless of provider,
+# but only the Anthropic adapter strips it. Non-Anthropic providers (Groq, etc.)
+# reject the unsupported 'cache_breakpoint' field. This patches it to a no-op.
+try:
+    import crewai.llms.cache as _crewai_cache
+    _crewai_cache.mark_cache_breakpoint = lambda msg: msg
+except (ImportError, AttributeError):
+    pass
+# --- End workaround ---
+
+
 
 class DuckDuckGoSearchTool(BaseTool):
     name: str = "duckduckgo_search"
