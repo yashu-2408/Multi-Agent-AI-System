@@ -1,6 +1,5 @@
 import streamlit as st
 from research_agents import ResearchCrew
-import os
 
 st.set_page_config(page_title="AI Research Assistant", page_icon="🔍", layout="centered")
 
@@ -15,13 +14,13 @@ st.markdown("Generate comprehensive research reports using a team of specialized
 
 with st.sidebar:
     st.header("Settings")
-    try:
-        default_api_key = st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY", "")
-    except Exception:
-        default_api_key = os.getenv("GROQ_API_KEY", "")
 
-    api_key = st.text_input("Groq API Key", value=default_api_key, type="password")
-    st.info("Built with CrewAI, Groq (Llama 3.3 70B), and Streamlit.")
+    st.caption("Provide at least one key. If the first provider hits a rate limit, the app automatically falls back to the next. Keys are never stored — you'll need to re-enter them each session.")
+
+    groq_api_key = st.text_input("Groq API Key", value="", type="password")
+    gemini_api_key = st.text_input("Gemini API Key", value="", type="password")
+
+    st.info("Built with CrewAI, Groq + Gemini (automatic failover), and Streamlit.")
 
 topic = st.text_input("What do you want to research?", placeholder="e.g. The impact of Generative AI on Software Engineering")
 instructions = st.text_area("Specific Instructions (Optional)", placeholder="Focus on the next 5 years...")
@@ -29,14 +28,17 @@ instructions = st.text_area("Specific Instructions (Optional)", placeholder="Foc
 if st.button("Generate Report"):
     if not topic:
         st.warning("Please enter a topic to start.")
-    elif not api_key:
-        st.error("Please provide a Groq API Key in the sidebar.")
+    elif not groq_api_key and not gemini_api_key:
+        st.error("Please provide at least one API key (Groq or Gemini) in the sidebar.")
     else:
         try:
             with st.status("🤖 AI Agents are working...", expanded=True) as status:
-                st.write("📋 Planning and Gathering Data...")
-                crew = ResearchCrew(topic, instructions, api_key)
-                result = crew.run()
+
+                def on_provider_switch(label):
+                    st.write(f"⚙️ Using provider: **{label}**")
+
+                crew = ResearchCrew(topic, instructions, groq_api_key, gemini_api_key)
+                result = crew.run(on_provider_switch=on_provider_switch)
                 status.update(label="✅ Research Complete!", state="complete", expanded=False)
 
             st.success("Successfully generated report!")
@@ -52,12 +54,13 @@ if st.button("Generate Report"):
 
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
+            st.caption("If this is a rate-limit error, all configured providers were exhausted. Try again shortly, or add a second API key in the sidebar.")
 
-with st.expander("💡How this works"):
+with st.expander("💡 How this works"):
     st.write("""
-    This app demonstrates a **Multi-Agent Orchestration** pattern:
+    This app demonstrates a **Multi-Agent Orchestration** pattern with automatic provider failover:
     1. **Separation of Concerns**: Each agent (Planner, Researcher, Writer) has a specific role and backstory.
     2. **Sequential Workflow**: Tasks are passed from one agent to the next, ensuring structured output.
     3. **Tool Integration**: The Researcher uses DuckDuckGo Search to pull live web data.
-    4. **Groq + Llama 3.3 70B**: Ultra-fast inference with a generous free tier.
+    4. **Multi-Provider Failover**: If Groq hits a rate limit, the app automatically retries the entire crew run with Gemini, and vice versa — improving reliability without manual intervention.
     """)
