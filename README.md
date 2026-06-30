@@ -26,13 +26,7 @@ This app is optimized for [Streamlit Community Cloud](https://share.streamlit.io
 1. **GitHub**: Push this project to a public GitHub repository.
 2. **Deploy**: Sign in to [Streamlit Cloud](https://share.streamlit.io/) and click "New app".
 3. **Configure**: Select your repository, branch, and `app.py` as the main file.
-4. **Secrets**: 
-   - Before clicking "Deploy", click "Advanced settings".
-   - In the "Secrets" text area, add your Gemini API key like this:
-     ```toml
-     GOOGLE_API_KEY = "your_api_key_here"
-     ```
-5. **Launch**: Click "Deploy" and your multi-agent assistant will be live!
+4. **Launch**: Click "Deploy" and your multi-agent assistant will be live!
 
 ## 🛠️ Local Setup
 
@@ -45,7 +39,7 @@ This app is optimized for [Streamlit Community Cloud](https://share.streamlit.io
    streamlit run app.py
    ```
 
-## 📄 Portfolio Highlights (Interview Ready)
+## 📄 Project Highlights
 
 - **Multi-Agent Orchestration**: Demonstrated ability to manage complex LLM workflows using CrewAI.
 - **Effective Prompt Engineering**: Developed role-based agents with specific backstories and goals.
