@@ -1,34 +1,4 @@
 from crewai import Agent, Task, Crew, Process, LLM
-import crewai.llms.cache as _crewai_cache
-import litellm
-
-# Workaround for Groq cache_breakpoint bug: https://github.com/crewAIInc/crewAI/issues/5886
-# 1. Patch CrewAI's cache marker to do nothing
-_crewai_cache.mark_cache_breakpoint = lambda msg: msg
-
-# 2. Patch LiteLLM to strip cache_breakpoint from messages as a safety net
-def _strip_cache_breakpoints(messages):
-    if not messages:
-        return messages
-    for msg in messages:
-        if isinstance(msg, dict):
-            msg.pop("cache_breakpoint", None)
-    return messages
-
-original_completion = litellm.completion
-def patched_completion(*args, **kwargs):
-    if "messages" in kwargs:
-        kwargs["messages"] = _strip_cache_breakpoints(kwargs["messages"])
-    return original_completion(*args, **kwargs)
-litellm.completion = patched_completion
-
-original_acompletion = litellm.acompletion
-async def patched_acompletion(*args, **kwargs):
-    if "messages" in kwargs:
-        kwargs["messages"] = _strip_cache_breakpoints(kwargs["messages"])
-    return await original_acompletion(*args, **kwargs)
-litellm.acompletion = patched_acompletion
-
 from crewai.tools import BaseTool
 from duckduckgo_search import DDGS
 import os
@@ -54,11 +24,11 @@ class ResearchCrew:
         self.topic = topic
         self.instructions = instructions
 
+        if api_key:
+            os.environ["GROQ_API_KEY"] = api_key
+
         # Groq is free, fast, and reliable — llama-3.3-70b is their best free model
-        self.llm = LLM(
-            model="groq/llama-3.3-70b-versatile",
-            api_key=api_key
-        )
+        self.llm = LLM(model="groq/openai/gpt-oss-120b")
         self.search_tool = DuckDuckGoSearchTool()
 
     def run(self):
