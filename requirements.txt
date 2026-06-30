@@ -8,3 +8,4 @@ python-dotenv
 ddgs
 groq
 litellm
+google-generativeai
