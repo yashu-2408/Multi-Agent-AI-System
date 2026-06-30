@@ -10,13 +10,13 @@ User Topic -> [ Planner Agent ] -> [ Researcher Agent ] -> [ Writer Agent ] -> F
 
 1.  **Planner**: Breaks the topic into 3-5 key research objectives.
 2.  **Researcher**: Searches the live web using DuckDuckGo to gather data.
-3.  **Writer**: Synthesizes all findings into a structured Markdown report.
+3.  **Writer**: Synthesizes all findings into a structured Markdown report/PDF.
 
 ## 🌟 Key Features
 
 - **Team-Based AI**: Uses specialized agents instead of a single prompt.
 - **Live Search**: Integrated web search for up-to-date data.
-- **Export Ready**: Download your generated research as professional Markdown.
+- **Export Ready**: Download your generated research as professional Markdown(PDF Download feature will be added soon).
 - **Cloud Native**: Optimized for 1-click deployment on Streamlit Cloud.
 
 ## 🌐 Deployment (Streamlit Community Cloud)
