@@ -54,12 +54,12 @@ class ResearchCrew:
         if groq_api_key:
             os.environ["GROQ_API_KEY"] = groq_api_key
             self.providers.append((
-                "Groq (gpt-oss-120b)",
-                LLM(model="groq/openai/gpt-oss-120b")
-            ))
-            self.providers.append((
                 "Groq (llama-3.3-70b)",
                 LLM(model="groq/llama-3.3-70b-versatile")
+            ))
+            self.providers.append((
+                "Groq (llama-3.1-8b)",
+                LLM(model="groq/llama-3.1-8b-instant")
             ))
 
         if gemini_api_key:
